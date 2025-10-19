@@ -21,7 +21,7 @@ class RegistrationController extends Controller
         // Check for duplicate name and by church
         $existingYouth = Youth::where('first_name', $request->first_name)
                              ->where('last_name', $request->last_name)
-                             ->orWhere('church', $request->church)
+                            //  ->orWhere('church', $request->church)
                              ->first();
 
         if ($existingYouth) {
