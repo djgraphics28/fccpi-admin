@@ -11,7 +11,6 @@ class Youth extends Model
         'last_name',
         'gender',
         'church',
-        'group',
         'color'
     ];
 }
