@@ -13,4 +13,14 @@ class Youth extends Model
         'church',
         'color'
     ];
+
+    public function getFirstNameAttribute($value)
+    {
+        return ucfirst($value);
+    }
+
+    public function getLastNameAttribute($value)
+    {
+        return ucfirst($value);
+    }
 }
