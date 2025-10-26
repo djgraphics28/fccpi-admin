@@ -16,11 +16,11 @@ class Youth extends Model
 
     public function getFirstNameAttribute($value)
     {
-        return ucfirst($value);
+        return strtoupper($value);
     }
 
     public function getLastNameAttribute($value)
     {
-        return ucfirst($value);
+        return strtoupper($value);
     }
 }
