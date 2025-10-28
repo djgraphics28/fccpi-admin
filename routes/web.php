@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use Laravel\Fortify\Features;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PrintNameTagController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,6 +20,9 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
     Volt::route('members', 'members.index')->name('members');
+
+    Route::get('print-name-tags', [PrintNameTagController::class, 'print'])
+        ->name('print.name.tags');
 
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(

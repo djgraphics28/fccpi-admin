@@ -312,8 +312,9 @@ new class extends Component {
     /**
      * Show print modal
      */
-    public function showPrintModal(): void
+    public function printModal(): void
     {
+        // dd('print modal');
         $this->showPrintModal = true;
     }
 
@@ -374,17 +375,23 @@ new class extends Component {
     /**
      * Print name tags
      */
-    public function printNameTags(): void
-    {
-        $this->showPrintModal = false;
+    // public function printNameTags(): void
+    // {
+    //     $this->showPrintModal = false;
 
-        // Dispatch browser event to trigger print
-        $this->dispatch('open-print-preview', [
-            'layout' => $this->printLayout,
-            'includeChurch' => $this->includeChurch,
-            'includeColorGroup' => $this->includeColorGroup,
-            'fontSize' => $this->fontSize,
-        ]);
+    //     // Dispatch browser event to trigger print
+    //     $this->dispatch('open-print-preview', [
+    //         'layout' => $this->printLayout,
+    //         'includeChurch' => $this->includeChurch,
+    //         'includeColorGroup' => $this->includeColorGroup,
+    //         'fontSize' => $this->fontSize,
+    //     ]);
+    // }
+
+    public function printNameTags()
+    {
+        $selectedIds = $this->selectedMembers; // array of IDs
+        return redirect()->route('print.name.tags', ['ids' => $selectedIds]);
     }
 
     /**
@@ -583,7 +590,7 @@ new class extends Component {
                         </span>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <button wire:click="showPrintModal"
+                        <button wire:click="printNameTags()"
                             class="flex items-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -1190,7 +1197,7 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Print Name Tags Modal -->
+    <!-- Update the Print Modal section -->
     <div x-data="{ open: @entangle('showPrintModal') }" x-show="open" class="fixed inset-0 z-50 overflow-y-auto">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" x-show="open"
@@ -1229,30 +1236,17 @@ new class extends Component {
                                 </p>
                             </div>
 
-                            <!-- Layout Options -->
+                            <!-- Layout Info -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Layout (A4/Legal 8.5" x 13")
+                                    Layout (A4 - 2 columns)
                                 </label>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <label
-                                        class="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <input type="radio" wire:model="printLayout" value="3x8"
-                                            class="text-purple-600 focus:ring-purple-500" checked>
-                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                            <strong>3×8</strong><br>
-                                            <span class="text-xs text-gray-500">24 tags per page</span>
-                                        </span>
-                                    </label>
-                                    <label
-                                        class="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <input type="radio" wire:model="printLayout" value="4x10"
-                                            class="text-purple-600 focus:ring-purple-500">
-                                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                            <strong>4×10</strong><br>
-                                            <span class="text-xs text-gray-500">40 tags per page</span>
-                                        </span>
-                                    </label>
+                                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        <strong>A4 Size:</strong> 2 columns per page<br>
+                                        <strong>Content:</strong> First name + Color group<br>
+                                        <strong>Orientation:</strong> Portrait
+                                    </p>
                                 </div>
                             </div>
 
@@ -1286,12 +1280,6 @@ new class extends Component {
                             <!-- Options -->
                             <div class="space-y-2">
                                 <label class="flex items-center">
-                                    <input type="checkbox" wire:model="includeChurch"
-                                        class="rounded border-gray-300 text-purple-600 focus:ring-purple-500" checked>
-                                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Include Church
-                                        Name</span>
-                                </label>
-                                <label class="flex items-center">
                                     <input type="checkbox" wire:model="includeColorGroup"
                                         class="rounded border-gray-300 text-purple-600 focus:ring-purple-500" checked>
                                     <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Include Color
@@ -1319,28 +1307,29 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Print Preview (Hidden until triggered) -->
+    <!-- Update the Print Preview section -->
     <div id="print-preview" class="hidden">
-        <div class="name-tags-container" style="page-break-after: always;">
-            @foreach ($this->getMembersForPrint()->chunk($printLayout === '3x8' ? 24 : 40) as $pageIndex => $pageMembers)
+        <div class="name-tags-container">
+            @foreach ($this->getMembersForPrint()->chunk(16) as $pageIndex => $pageMembers)
                 <div class="name-tags-page"
                     style="
-                width: 8.5in;
-                height: 13in;
-                padding: 0.25in;
+                width: 210mm;
+                height: 297mm;
+                padding: 15mm;
                 display: grid;
-                grid-template-columns: {{ $printLayout === '3x8' ? 'repeat(3, 1fr)' : 'repeat(4, 1fr)' }};
-                grid-template-rows: {{ $printLayout === '3x8' ? 'repeat(8, 1fr)' : 'repeat(10, 1fr)' }};
-                gap: 0.1in;
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(8, 1fr);
+                gap: 8mm;
                 page-break-after: always;
                 font-family: Arial, sans-serif;
+                background: white;
             ">
                     @foreach ($pageMembers as $member)
                         <div class="name-tag"
                             style="
                         border: 2px solid {{ $member->color }};
-                        border-radius: 8px;
-                        padding: 0.2in;
+                        border-radius: 12px;
+                        padding: 6mm;
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
@@ -1348,60 +1337,61 @@ new class extends Component {
                         text-align: center;
                         background: white;
                         break-inside: avoid;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                     ">
-                            <!-- Name -->
+                            <!-- First Name Only -->
                             <div
                                 style="
                             font-weight: bold;
-                            margin-bottom: 0.1in;
-                            font-size: {{ $fontSize === 'small' ? '14px' : ($fontSize === 'medium' ? '16px' : '18px') }};
+                            margin-bottom: 3mm;
+                            font-size: {{ $fontSize === 'small' ? '20pt' : ($fontSize === 'medium' ? '24pt' : '28pt') }};
                             color: #1f2937;
+                            line-height: 1.2;
                         ">
-                                {{ $member->first_name }} {{ $member->last_name }}
+                                {{ $member->first_name }}
                             </div>
-
-                            <!-- Church (if enabled) -->
-                            @if ($includeChurch)
-                                <div
-                                    style="
-                            font-size: {{ $fontSize === 'small' ? '10px' : ($fontSize === 'medium' ? '12px' : '14px') }};
-                            color: #6b7280;
-                            margin-bottom: 0.05in;
-                        ">
-                                    {{ $member->church }}
-                                </div>
-                            @endif
 
                             <!-- Color Group (if enabled) -->
                             @if ($includeColorGroup)
                                 <div
                                     style="
-                            display: flex;
-                            align-items: center;
-                            gap: 0.1in;
-                            margin-top: 0.05in;
-                        ">
-                                    <div class="w-3 h-3 rounded border"
+                                display: flex;
+                                align-items: center;
+                                gap: 2mm;
+                                margin-top: 2mm;
+                            ">
+                                    <div class="w-4 h-4 rounded border"
                                         style="background-color: {{ $member->color }}; border: 1px solid #d1d5db;">
                                     </div>
                                     <span
                                         style="
-                                font-size: {{ $fontSize === 'small' ? '10px' : ($fontSize === 'medium' ? '11px' : '12px') }};
-                                color: #374151;
-                                font-weight: 500;
-                            ">
+                                    font-size: {{ $fontSize === 'small' ? '10pt' : ($fontSize === 'medium' ? '12pt' : '14pt') }};
+                                    color: #374151;
+                                    font-weight: 500;
+                                ">
                                         {{ $this->getColorName($member->color) }}
                                     </span>
                                 </div>
                             @endif
                         </div>
                     @endforeach
+
+                    <!-- Fill empty slots to maintain grid layout -->
+                    @for ($i = count($pageMembers); $i < 16; $i++)
+                        <div class="empty-slot"
+                            style="
+                        border: 2px dashed #d1d5db;
+                        border-radius: 12px;
+                        background: transparent;
+                    ">
+                        </div>
+                    @endfor
                 </div>
             @endforeach
         </div>
     </div>
 
-    <!-- JavaScript for Print Functionality -->
+    <!-- Update the JavaScript for Print Functionality -->
     <script>
         document.addEventListener('livewire:initialized', () => {
             Livewire.on('open-print-preview', (options) => {
@@ -1423,35 +1413,54 @@ new class extends Component {
 
         // Print styles
         const printStyles = `
-            <style>
-                @media print {
-                    body * {
-                        visibility: hidden;
-                    }
-                    #print-preview,
-                    #print-preview * {
-                        visibility: visible;
-                    }
-                    #print-preview {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                        height: 100%;
-                    }
-                    .name-tags-page {
-                        page-break-after: always;
-                        margin: 0;
-                        padding: 0.25in;
-                    }
-                    .name-tag {
-                        break-inside: avoid;
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                    }
+        <style>
+            @media print {
+                body * {
+                    visibility: hidden;
                 }
-            </style>
-        `;
+                #print-preview,
+                #print-preview * {
+                    visibility: visible;
+                }
+                #print-preview {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: white;
+                }
+                .name-tags-page {
+                    page-break-after: always;
+                    margin: 0;
+                    padding: 15mm;
+                    width: 210mm;
+                    height: 297mm;
+                }
+                .name-tag {
+                    break-inside: avoid;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .empty-slot {
+                    visibility: hidden !important;
+                }
+                @page {
+                    size: A4 portrait;
+                    margin: 0;
+                }
+            }
+
+            /* Screen preview styles */
+            @media screen {
+                .name-tags-page {
+                    margin: 20px auto;
+                    border: 1px solid #e5e7eb;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                }
+            }
+        </style>
+    `;
 
         // Add print styles to document
         if (!document.querySelector('#print-styles')) {
