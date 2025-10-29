@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Youth Fellowship Name Tags</title>
@@ -13,11 +14,11 @@
             padding: 0;
             font-family: "Arial Black", Arial, sans-serif;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             justify-items: center;
             align-items: center;
             background: #fff;
-            gap: 0.5px; /* space between each card */
+            gap: 0.5px;
         }
 
         .name-tag {
@@ -32,8 +33,25 @@
             box-sizing: border-box;
             padding: 10px;
             border-radius: 12px;
-            background: #fff;
-            margin: 0.5px; /* ensure small outer spacing for print */
+            margin: 0.5px;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
+                url('/images/nametag-bg.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* White text border (stroke effect) */
+        .event-title,
+        .name-tag h1,
+        .color-group {
+            text-shadow:
+                -1px -1px 0 #fff,
+                1px -1px 0 #fff,
+                -1px 1px 0 #fff,
+                1px 1px 0 #fff;
         }
 
         .event-title {
@@ -63,15 +81,20 @@
                 margin: 0;
                 padding: 0;
                 gap: 0.5px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
 
             .name-tag {
                 page-break-inside: avoid;
                 margin: 0.5px;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
     </style>
 </head>
+
 <body>
     @php
         $colorNames = [
@@ -98,10 +121,10 @@
         ];
     @endphp
 
-    @foreach($youths as $youth)
+    @foreach ($youths as $youth)
         @php
             $colorValue = strtoupper(trim($youth->color));
-            $colorName = $colorNames[$colorValue] ?? 'Group';
+            $colorName = $colorNames[$colorValue] ?? 'FACILITATOR Group';
         @endphp
 
         <div class="name-tag" style="border-color: {{ $colorValue }}">
@@ -119,4 +142,5 @@
         window.onload = () => window.print();
     </script>
 </body>
+
 </html>

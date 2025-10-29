@@ -11,7 +11,8 @@ class Youth extends Model
         'last_name',
         'gender',
         'church',
-        'color'
+        'color',
+        'is_facilitator',
     ];
 
     public function getFirstNameAttribute($value)

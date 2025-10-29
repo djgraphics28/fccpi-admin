@@ -13,6 +13,7 @@ new class extends Component {
     public $gender = '';
     public $church = '';
     public $color_filter = '';
+    public $is_facilitator_filter = '';
 
     public $churches;
     public $colors;
@@ -48,8 +49,9 @@ new class extends Component {
     #[Validate('required|string')]
     public $church_form = '';
 
-    #[Validate('required|string')]
     public $color = '#3B82F6';
+
+    public $is_facilitator = false;
 
     /**
      * Mount the component.
@@ -72,6 +74,7 @@ new class extends Component {
         $this->resetPage();
         $this->selectedMembers = [];
         $this->selectAll = false;
+        $this->is_facilitator_filter = '';
     }
 
     /**
@@ -102,6 +105,13 @@ new class extends Component {
             ->when($this->color_filter, function ($query) {
                 $query->where('color', $this->color_filter);
             })
+            ->when($this->is_facilitator_filter, function ($query) {
+                if ($this->is_facilitator_filter === 'yes') {
+                    $query->where('is_facilitator', true);
+                } elseif ($this->is_facilitator_filter === 'no') {
+                    $query->where('is_facilitator', false);
+                }
+            })
             ->latest()
             ->paginate(10);
     }
@@ -126,6 +136,14 @@ new class extends Component {
             ->when($this->color_filter, function ($query) {
                 $query->where('color', $this->color_filter);
             })
+            ->when($this->is_facilitator_filter, function ($query) {
+                if ($this->is_facilitator_filter === 'yes') {
+                    $query->where('is_facilitator', true);
+                } elseif ($this->is_facilitator_filter === 'no') {
+                    $query->where('is_facilitator', false);
+                }
+            })
+            ->orderBy('first_name')
             ->pluck('id')
             ->toArray();
     }
@@ -173,7 +191,9 @@ new class extends Component {
 
         $colorCounts = Youth::selectRaw('color, COUNT(*) as count')->groupBy('color')->get()->pluck('count', 'color');
 
-        return compact('total', 'male', 'female', 'churchCounts', 'colorCounts');
+        $totalFacilitators = Youth::where('is_facilitator', true)->count();
+
+        return compact('total', 'male', 'female', 'churchCounts', 'colorCounts', 'totalFacilitators');
     }
 
     /**
@@ -249,6 +269,7 @@ new class extends Component {
             $this->gender_form = $member->gender;
             $this->church_form = $member->church;
             $this->color = $member->color ?? '#3B82F6';
+            $this->is_facilitator = $member->is_facilitator;
         }
 
         $this->showModal = true;
@@ -267,6 +288,7 @@ new class extends Component {
             'gender' => $this->gender_form,
             'church' => $this->church_form,
             'color' => $this->color,
+            'is_facilitator' => $this->is_facilitator,
         ];
 
         if ($this->editingId) {
@@ -371,22 +393,6 @@ new class extends Component {
             throw new \Exception('Color randomization failed. Please try again.');
         }
     }
-
-    /**
-     * Print name tags
-     */
-    // public function printNameTags(): void
-    // {
-    //     $this->showPrintModal = false;
-
-    //     // Dispatch browser event to trigger print
-    //     $this->dispatch('open-print-preview', [
-    //         'layout' => $this->printLayout,
-    //         'includeChurch' => $this->includeChurch,
-    //         'includeColorGroup' => $this->includeColorGroup,
-    //         'fontSize' => $this->fontSize,
-    //     ]);
-    // }
 
     public function printNameTags()
     {
@@ -702,6 +708,18 @@ new class extends Component {
                 </select>
             </div>
 
+            <div>
+                <label for="is_facilitator_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Facilitator Status
+                </label>
+                <select id="is_facilitator_filter" wire:model.live="is_facilitator_filter"
+                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <option value="">All Members</option>
+                    <option value="yes">Facilitators ({{ $stats['totalFacilitators'] }})</option>
+                    <option value="no">Non-Facilitators ({{ $stats['total'] - $stats['totalFacilitators'] }})</option>
+                </select>
+            </div>
+
             <!-- Reset Button -->
             <div class="flex justify-end">
                 <button wire:click="resetFilters"
@@ -921,6 +939,15 @@ new class extends Component {
                                 @error('gender_form')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
+                            </div>
+
+                            <div>
+                                <!-- Facilitator Checkbox -->
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" wire:model="is_facilitator"
+                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <span class="ml-2 text-gray-700 dark:text-gray-300">Is Facilitator</span>
+                                </label>
                             </div>
 
                             <!-- Church -->

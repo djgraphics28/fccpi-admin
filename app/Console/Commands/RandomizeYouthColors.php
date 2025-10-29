@@ -29,9 +29,7 @@ class RandomizeYouthColors extends Command
      */
     protected $colorPalette = [
         '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
-        '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1',
-        '#14B8A6', '#EAB308', '#A855F7', '#D946EF', '#0EA5E9',
-        '#22C55E', '#FACC15', '#FB923C', '#C084FC', '#F472B6'
+        '#EC4899', '#06B6D4', '#64a00bff', '#F97316', '#6366F1'
     ];
 
     /**
