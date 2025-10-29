@@ -269,7 +269,7 @@ new class extends Component {
             $this->gender_form = $member->gender;
             $this->church_form = $member->church;
             $this->color = $member->color ?? '#3B82F6';
-            $this->is_facilitator = $member->is_facilitator;
+            $this->is_facilitator = $member->is_facilitator ? true : false;
         }
 
         $this->showModal = true;
