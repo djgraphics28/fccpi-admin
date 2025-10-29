@@ -292,6 +292,9 @@ new class extends Component {
         ];
 
         if ($this->editingId) {
+            if($this->is_facilitator){
+                $data['color'] = null; // Clear color if member is a facilitator
+            }
             Youth::find($this->editingId)->update($data);
             session()->flash('message', 'Member updated successfully!');
         } else {
