@@ -43,6 +43,22 @@
             print-color-adjust: exact;
         }
 
+        .name-tag h1 {
+            font-size: 85px;
+            /* increased from 75px */
+            margin: 8px 0 4px 0;
+            text-transform: uppercase;
+            line-height: 1;
+            -webkit-text-stroke: 4px #000;
+            /* black border around text */
+            text-shadow:
+                -1px -1px 0 #fff,
+                1px -1px 0 #fff,
+                -1px 1px 0 #fff,
+                1px 1px 0 #fff;
+        }
+
+
         /* White text border (stroke effect) */
         .event-title,
         .name-tag h1,

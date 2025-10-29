@@ -612,6 +612,7 @@ new class extends Component {
                             </svg>
                             Randomize Colors
                         </button>
+                        @if(Auth::user()->id === 1)
                         <button wire:click="showBulkActionModal('delete')"
                             class="flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -620,6 +621,7 @@ new class extends Component {
                             </svg>
                             Delete Selected
                         </button>
+                        @endif
                         <button wire:click="clearSelection"
                             class="flex items-center px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -823,6 +825,7 @@ new class extends Component {
                                         </svg>
                                         Edit
                                     </button>
+                                    @if(Auth::user()->id === 1 )
                                     <button wire:click="deleteMember({{ $member->id }})"
                                         wire:confirm="Are you sure you want to delete this member?"
                                         class="inline-flex items-center px-3 py-1.5 text-sm bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors"
@@ -834,6 +837,7 @@ new class extends Component {
                                         </svg>
                                         Delete
                                     </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
