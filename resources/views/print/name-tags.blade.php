@@ -23,7 +23,7 @@
 
         .name-tag {
             width: 100%;
-            height: 260px;
+            height: 500px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -71,7 +71,7 @@
         }
 
         .event-title {
-            font-size: 13px;
+            font-size: 30px;
             font-weight: bold;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -79,14 +79,14 @@
         }
 
         .name-tag h1 {
-            font-size: 75px;
+           font-size: clamp(80px, 10vw, 150px);
             margin: 8px 0 4px 0;
             text-transform: uppercase;
             line-height: 1;
         }
 
         .color-group {
-            font-size: 22px;
+            font-size: 30px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
