@@ -64,7 +64,7 @@ class RandomizeYouthColors extends Command
         }
 
         // Get members to process
-        $query = Youth::query();
+        $query = Youth::query()->where('is_facilitator', false);
         if (!empty($memberIds)) {
             $query->whereIn('id', $memberIds);
         }

@@ -359,8 +359,17 @@ new class extends Component {
                     break;
 
                 case 'randomize':
+                    // Filter out facilitators from selected members
+                    $nonFacilitatorMembers = Youth::whereIn('id', $this->selectedMembers)->where('is_facilitator', false)->pluck('id')->toArray();
+
+                    if (empty($nonFacilitatorMembers)) {
+                        session()->flash('error', 'No non-facilitator members selected for randomization.');
+                        break;
+                    }
+
+                    $this->selectedMembers = $nonFacilitatorMembers;
                     $this->randomizeColorsUsingCommand();
-                    session()->flash('message', count($this->selectedMembers) . ' members randomized successfully!');
+                    session()->flash('message', count($nonFacilitatorMembers) . ' members randomized successfully!');
                     break;
             }
 
@@ -612,15 +621,15 @@ new class extends Component {
                             </svg>
                             Randomize Colors
                         </button>
-                        @if(Auth::user()->id === 1)
-                        <button wire:click="showBulkActionModal('delete')"
-                            class="flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Delete Selected
-                        </button>
+                        @if (Auth::user()->id === 1)
+                            <button wire:click="showBulkActionModal('delete')"
+                                class="flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Delete Selected
+                            </button>
                         @endif
                         <button wire:click="clearSelection"
                             class="flex items-center px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors">
@@ -711,14 +720,16 @@ new class extends Component {
             </div>
 
             <div>
-                <label for="is_facilitator_filter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label for="is_facilitator_filter"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Facilitator Status
                 </label>
                 <select id="is_facilitator_filter" wire:model.live="is_facilitator_filter"
                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                     <option value="">All Members</option>
                     <option value="yes">Facilitators ({{ $stats['totalFacilitators'] }})</option>
-                    <option value="no">Non-Facilitators ({{ $stats['total'] - $stats['totalFacilitators'] }})</option>
+                    <option value="no">Non-Facilitators ({{ $stats['total'] - $stats['totalFacilitators'] }})
+                    </option>
                 </select>
             </div>
 
@@ -825,18 +836,18 @@ new class extends Component {
                                         </svg>
                                         Edit
                                     </button>
-                                    @if(Auth::user()->id === 1 )
-                                    <button wire:click="deleteMember({{ $member->id }})"
-                                        wire:confirm="Are you sure you want to delete this member?"
-                                        class="inline-flex items-center px-3 py-1.5 text-sm bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors"
-                                        data-test="delete-member-button">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Delete
-                                    </button>
+                                    @if (Auth::user()->id === 1)
+                                        <button wire:click="deleteMember({{ $member->id }})"
+                                            wire:confirm="Are you sure you want to delete this member?"
+                                            class="inline-flex items-center px-3 py-1.5 text-sm bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors"
+                                            data-test="delete-member-button">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            Delete
+                                        </button>
                                     @endif
                                 </div>
                             </td>
