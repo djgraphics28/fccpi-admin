@@ -29,7 +29,8 @@ class RandomizeYouthColors extends Command
      */
     protected $colorPalette = [
         '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
-        '#EC4899', '#06B6D4', '#64a00bff', '#F97316', '#6366F1'
+        '#EC4899', '#06B6D4', '#64a00bff', '#F97316', '#6366F1',
+        '#14B8A6', '#EAB308', '#A855F7', '#D946EF', '#0EA5E9',
     ];
 
     /**
@@ -41,17 +42,19 @@ class RandomizeYouthColors extends Command
         $memberIds = $this->option('memberIds');
 
         // Convert memberIds to array if it's provided as a string
-        if (!empty($memberIds) && is_string($memberIds)) {
+        if (! empty($memberIds) && is_string($memberIds)) {
             $memberIds = explode(',', $memberIds);
         }
 
-        if (!$colorNumber) {
+        if (! $colorNumber) {
             $this->error('Number of color groups is required.');
+
             return 1;
         }
 
-        if (!is_numeric($colorNumber) || $colorNumber < 2) {
+        if (! is_numeric($colorNumber) || $colorNumber < 2) {
             $this->error('Please provide a valid number of color groups (minimum 2).');
+
             return 1;
         }
 
@@ -59,13 +62,14 @@ class RandomizeYouthColors extends Command
 
         // Validate that we don't exceed available colors
         if ($colorNumber > count($this->colorPalette)) {
-            $this->error("Maximum number of colors available is " . count($this->colorPalette));
+            $this->error('Maximum number of colors available is '.count($this->colorPalette));
+
             return 1;
         }
 
         // Get members to process
         $query = Youth::query()->where('is_facilitator', false);
-        if (!empty($memberIds)) {
+        if (! empty($memberIds)) {
             $query->whereIn('id', $memberIds);
         }
 
@@ -73,6 +77,7 @@ class RandomizeYouthColors extends Command
 
         if ($totalMembers === 0) {
             $this->error('No youth members found.');
+
             return 1;
         }
 
@@ -84,7 +89,7 @@ class RandomizeYouthColors extends Command
 
         $this->info("\nDistribution plan:");
         foreach ($distribution as $index => $count) {
-            $this->line("Group " . ($index + 1) . ": {$count} members");
+            $this->line('Group '.($index + 1).": {$count} members");
         }
 
         // Since this is called programmatically, we'll proceed without confirmation
@@ -158,7 +163,7 @@ class RandomizeYouthColors extends Command
             ->get();
 
         $this->info("\nFinal distribution:");
-        $this->info("==================");
+        $this->info('==================');
 
         foreach ($colorDistribution as $group) {
             $this->line("Color {$group->color}: {$group->count} members");

@@ -292,7 +292,7 @@ new class extends Component {
         ];
 
         if ($this->editingId) {
-            if($this->is_facilitator){
+            if ($this->is_facilitator) {
                 $data['color'] = null; // Clear color if member is a facilitator
             }
             Youth::find($this->editingId)->update($data);
@@ -1005,6 +1005,11 @@ new class extends Component {
         '#84CC16' => 'Lime',
         '#F97316' => 'Orange',
         '#6366F1' => 'Indigo',
+        '#14B8A6' => 'Teal',
+        '#EAB308' => 'Amber',
+        '#A855F7' => 'Violet',
+        '#D946EF' => 'Fuchsia',
+        '#0EA5E9' => 'Sky',
     ] as $colorValue => $colorName)
                                         <button type="button" wire:click="$set('color', '{{ $colorValue }}')"
                                             class="h-8 rounded border-2 {{ $color === $colorValue ? 'border-gray-800 dark:border-white' : 'border-gray-300 dark:border-gray-600' }}"
