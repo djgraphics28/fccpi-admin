@@ -141,6 +141,7 @@
         @php
             $colorValue = strtoupper(trim($youth->color));
             $colorName = $colorNames[$colorValue] ?? 'FACILITATOR Group';
+            $churchName = strtoupper($youth->church);
         @endphp
 
         <div class="name-tag" style="border-color: {{ $colorValue }}">
@@ -150,6 +151,9 @@
             <h1 style="color: {{ $colorValue }}">{{ strtoupper($youth->first_name) }}</h1>
             <div class="color-group" style="color: {{ $colorValue }}">
                 {{ $colorName }}
+            </div>
+            <div class="church-name">
+                {{ $churchName }}
             </div>
         </div>
     @endforeach
